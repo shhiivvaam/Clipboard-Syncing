@@ -16,7 +16,6 @@ function createWindow() {
             nodeIntegration: false,
             contextIsolation: true
         },
-        // Modern look
         backgroundColor: '#1e1e1e',
         titleBarStyle: 'hiddenInset'
     });
@@ -29,7 +28,7 @@ function connectToServer() {
 
     ws.on('open', () => {
         console.log('Connected to Sync Server');
-        mainWindow.webContents.send('status', 'Connected to Server');
+        if (mainWindow) mainWindow.webContents.send('status', 'Connected to Server');
     });
 
     ws.on('message', (data) => {
@@ -53,6 +52,12 @@ function connectToServer() {
                         mainWindow.webContents.send('clipboard-updated', payload.text);
                     }
                     break;
+                case 'HISTORY':
+                    mainWindow.webContents.send('history', payload.history);
+                    break;
+                case 'COUNT':
+                    mainWindow.webContents.send('count', payload.count);
+                    break;
                 case 'ERROR':
                     mainWindow.webContents.send('error', payload.message);
                     break;
@@ -64,9 +69,9 @@ function connectToServer() {
 
     ws.on('close', () => {
         console.log('Disconnected. Reconnecting in 5s...');
-        mainWindow.webContents.send('status', 'Disconnected');
+        if (mainWindow) mainWindow.webContents.send('status', 'Disconnected');
         currentRoom = null;
-        mainWindow.webContents.send('room-left');
+        if (mainWindow) mainWindow.webContents.send('room-left');
         setTimeout(connectToServer, 5000);
     });
 
@@ -78,7 +83,7 @@ function connectToServer() {
 
 function startClipboardPolling() {
     setInterval(() => {
-        if (!currentRoom) return; // Only sync if in a room
+        if (!currentRoom) return;
 
         const text = clipboard.readText();
         if (text !== lastText && text.trim() !== '') {
@@ -91,7 +96,6 @@ function startClipboardPolling() {
     }, 1000);
 }
 
-// IPC Handlers
 ipcMain.handle('create-room', () => {
     if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send(JSON.stringify({ type: 'CREATE' }));

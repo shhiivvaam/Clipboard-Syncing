@@ -133,6 +133,12 @@
             user-select: text;
         }
 
+        .device-count {
+            font-size: 0.9rem;
+            color: #888;
+            margin-top: 5px;
+        }
+
         .history-container {
             background: var(--card-bg);
             border-radius: 12px;
@@ -141,7 +147,10 @@
             overflow-y: auto;
             width: 90%;
             margin: 0 auto;
-            max-height: 300px;
+            max-height: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
         .history-item {
@@ -152,11 +161,19 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .history-item:hover {
+            background: #3a3a3a;
         }
 
         .history-item:first-child {
             color: white;
             font-weight: bold;
+            border-left: 3px solid var(--accent-color);
+            padding-left: 7px;
         }
 
         .footer {
@@ -192,6 +209,7 @@
             <div class="room-header">
                 <div>Connected to Room</div>
                 <div id="current-room-code" class="room-code">------</div>
+                <div id="device-count" class="device-count">1 Device Connected</div>
             </div>
 
             <div class="history-container" id="clipboard-history">

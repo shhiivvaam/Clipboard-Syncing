@@ -33,6 +33,17 @@
             border-bottom: 1px solid #333;
             text-align: center;
             font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-dot {
+            height: 10px;
+            width: 10px;
+            background-color: #bbb;
+            border-radius: 50%;
+            display: inline-block;
         }
 
         .container {
@@ -133,6 +144,11 @@
             margin: 10px 0;
         }
 
+        .device-count {
+            font-size: 0.9rem;
+            color: #888;
+        }
+
         .actions {
             width: 100%;
             max-width: 300px;
@@ -141,42 +157,70 @@
             gap: 15px;
         }
 
-        .incoming-area {
-            margin-top: 20px;
+        .fallback-area {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
             background: var(--card-bg);
             padding: 15px;
             border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 80px;
+            background: #333;
+            color: white;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+
+        .history-list {
+            margin-top: 20px;
             width: 100%;
             max-width: 300px;
-            box-sizing: border-box;
-            display: none;
-        }
-
-        .incoming-text {
-            color: #ccc;
-            margin-bottom: 10px;
-            word-break: break-all;
-            max-height: 100px;
+            flex: 1;
             overflow-y: auto;
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 10px;
+            box-sizing: border-box;
+            max-height: 200px;
         }
 
-        .status-msg {
-            margin-top: 10px;
+        .history-item {
+            padding: 10px;
+            border-bottom: 1px solid #444;
             font-size: 0.9rem;
-            color: #888;
+            color: #ccc;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .history-item:first-child {
+            color: white;
+            font-weight: bold;
+            border-left: 3px solid var(--accent-color);
+            padding-left: 7px;
         }
 
         .btn-danger {
             background-color: var(--danger-color);
             color: white;
-            margin-top: 30px;
+            margin-top: 10px;
+            margin-bottom: 20px;
         }
     </style>
 </head>
 
 <body>
     <div class="header">
-        Clipboard Sync Mobile
+        <span>Clipboard Sync</span>
+        <span id="status-dot" class="status-dot"></span>
     </div>
 
     <div class="container">
@@ -186,7 +230,7 @@
             <div class="divider">OR</div>
             <input type="text" id="room-code-input" placeholder="Enter Room Code">
             <button id="join-btn" class="btn-secondary">Join Room</button>
-            <div id="status" class="status-msg" style="text-align: center;">Connecting to server...</div>
+            <div id="status-msg" style="text-align: center; margin-top: 10px; color: #888;">Connecting...</div>
         </div>
 
         <!-- Room Page -->
@@ -194,16 +238,29 @@
             <div class="room-header">
                 <div>Room Code</div>
                 <div id="current-room-code" class="room-code">------</div>
+                <div id="device-count" class="device-count">1 Device</div>
             </div>
 
             <div class="actions">
                 <button id="send-btn" class="btn-primary">📤 Push Clipboard</button>
+
+                <!-- Fallback for sending -->
+                <div id="send-fallback" class="fallback-area">
+                    <div style="font-size: 0.9rem;">Paste text here to send:</div>
+                    <textarea id="manual-input"></textarea>
+                    <button id="manual-send-btn" class="btn-primary">Send Text</button>
+                </div>
             </div>
 
-            <div id="incoming-area" class="incoming-area">
-                <div style="font-size: 0.8rem; color: #888; margin-bottom: 5px;">Received from Desktop:</div>
-                <div id="received-text" class="incoming-text"></div>
-                <button id="copy-btn" class="btn-secondary">📥 Copy to Device</button>
+            <div class="history-list" id="history-list">
+                <!-- History items -->
+            </div>
+
+            <!-- Fallback for receiving (Copy) -->
+            <div id="receive-fallback" class="fallback-area">
+                <div style="font-size: 0.9rem;">Latest text received:</div>
+                <textarea id="manual-output" readonly></textarea>
+                <div style="font-size: 0.8rem; color: #aaa;">Select and copy manually</div>
             </div>
 
             <button id="leave-btn" class="btn-danger">Disconnect</button>
@@ -213,30 +270,70 @@
     <script>
         const landingPage = document.getElementById('landing-page');
         const roomPage = document.getElementById('room-page');
-        const statusEl = document.getElementById('status');
+        const statusDot = document.getElementById('status-dot');
+        const statusMsg = document.getElementById('status-msg');
         const roomCodeInput = document.getElementById('room-code-input');
         const createBtn = document.getElementById('create-btn');
         const joinBtn = document.getElementById('join-btn');
         const leaveBtn = document.getElementById('leave-btn');
         const sendBtn = document.getElementById('send-btn');
-        const copyBtn = document.getElementById('copy-btn');
         const currentRoomCodeEl = document.getElementById('current-room-code');
-        const incomingArea = document.getElementById('incoming-area');
-        const receivedTextEl = document.getElementById('received-text');
+        const deviceCountEl = document.getElementById('device-count');
+        const historyList = document.getElementById('history-list');
+
+        // Fallback elements
+        const sendFallback = document.getElementById('send-fallback');
+        const manualInput = document.getElementById('manual-input');
+        const manualSendBtn = document.getElementById('manual-send-btn');
+        const receiveFallback = document.getElementById('receive-fallback');
+        const manualOutput = document.getElementById('manual-output');
 
         let ws;
         let currentRoom = null;
 
+        // Check persistence
+        const savedRoom = localStorage.getItem('roomCode');
+        if (savedRoom) {
+            roomCodeInput.value = savedRoom;
+        }
+
         function showLanding() {
             landingPage.style.display = 'flex';
             roomPage.style.display = 'none';
-            incomingArea.style.display = 'none';
+            historyList.innerHTML = '';
         }
 
         function showRoom(code) {
             landingPage.style.display = 'none';
             roomPage.style.display = 'flex';
             currentRoomCodeEl.innerText = code;
+            localStorage.setItem('roomCode', code);
+        }
+
+        function addHistoryItem(text) {
+            if (historyList.firstChild && historyList.firstChild.innerText === text) return;
+
+            const div = document.createElement('div');
+            div.className = 'history-item';
+            div.innerText = text;
+            div.onclick = () => {
+                copyText(text);
+            };
+            historyList.prepend(div);
+        }
+
+        async function copyText(text) {
+            try {
+                await navigator.clipboard.writeText(text);
+                alert('Copied!');
+            } catch (err) {
+                // Fallback
+                receiveFallback.style.display = 'flex';
+                manualOutput.value = text;
+                manualOutput.select();
+                // Scroll to bottom
+                window.scrollTo(0, document.body.scrollHeight);
+            }
         }
 
         function connect() {
@@ -248,8 +345,13 @@
             ws = new WebSocket(wsUrl);
 
             ws.onopen = () => {
-                statusEl.innerText = 'Connected to Server';
-                statusEl.style.color = '#4caf50';
+                statusDot.style.backgroundColor = '#4caf50';
+                statusMsg.innerText = 'Connected';
+
+                // Auto-join if saved
+                if (savedRoom) {
+                    ws.send(JSON.stringify({ type: 'JOIN', payload: { roomCode: savedRoom } }));
+                }
             };
 
             ws.onmessage = (event) => {
@@ -264,14 +366,27 @@
                             showRoom(currentRoom);
                             break;
                         case 'CLIPBOARD':
-                            receivedTextEl.innerText = payload.text;
-                            incomingArea.style.display = 'block';
+                            addHistoryItem(payload.text);
+                            // Try to auto-copy if possible (often blocked without user interaction)
+                            // But we show it in history/fallback anyway
+                            break;
+                        case 'HISTORY':
+                            historyList.innerHTML = '';
+                            payload.history.slice().reverse().forEach(text => addHistoryItem(text));
+                            break;
+                        case 'COUNT':
+                            deviceCountEl.innerText = `${payload.count} Device${payload.count !== 1 ? 's' : ''}`;
                             break;
                         case 'ERROR':
                             alert(payload.message);
+                            if (payload.message === 'Room not found') {
+                                localStorage.removeItem('roomCode');
+                                showLanding();
+                            }
                             break;
                         case 'LEFT':
                             currentRoom = null;
+                            localStorage.removeItem('roomCode');
                             showLanding();
                             break;
                     }
@@ -281,9 +396,8 @@
             };
 
             ws.onclose = () => {
-                statusEl.innerText = 'Disconnected. Reconnecting...';
-                statusEl.style.color = '#ef4444';
-                showLanding();
+                statusDot.style.backgroundColor = '#ef4444';
+                statusMsg.innerText = 'Disconnected. Reconnecting...';
                 setTimeout(connect, 3000);
             };
         }
@@ -312,20 +426,22 @@
                 const text = await navigator.clipboard.readText();
                 if (text && ws && ws.readyState === WebSocket.OPEN) {
                     ws.send(JSON.stringify({ type: 'CLIPBOARD', payload: { text } }));
-                    alert('Clipboard pushed!');
+                    alert('Pushed!');
                 }
             } catch (err) {
-                alert('Failed to read clipboard: ' + err.message);
+                // Fallback
+                sendFallback.style.display = 'flex';
+                manualInput.focus();
             }
         });
 
-        copyBtn.addEventListener('click', async () => {
-            try {
-                await navigator.clipboard.writeText(receivedTextEl.innerText);
-                alert('Copied to device!');
-                incomingArea.style.display = 'none';
-            } catch (err) {
-                alert('Failed to write clipboard: ' + err.message);
+        manualSendBtn.addEventListener('click', () => {
+            const text = manualInput.value;
+            if (text && ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'CLIPBOARD', payload: { text } }));
+                manualInput.value = '';
+                sendFallback.style.display = 'none';
+                alert('Pushed manually!');
             }
         });
 
