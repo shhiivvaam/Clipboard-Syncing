@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clipboard Sync Mobile</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            padding: 20px;
+            text-align: center;
+        }
+
+        button {
+            padding: 15px 25px;
+            font-size: 18px;
+            margin: 10px;
+            width: 80%;
+            border-radius: 8px;
+            border: none;
+            background: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:active {
+            background: #0056b3;
+        }
+
+        #log {
+            margin-top: 20px;
+            color: #555;
+            word-break: break-all;
+        }
+
+        .received {
+            background: #e8f5e9;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Sync Clipboard</h1>
+
+    <div id="status">Disconnected</div>
+
+    <button id="sendBtn">📤 Push Clipboard</button>
+    <div id="incomingArea" style="display:none;">
+        <h3>Received Text:</h3>
+        <p id="receivedText" class="received"></p>
+        <button id="copyBtn">📥 Copy to Device</button>
+    </div>
+
+    <div id="log"></div>
+
+    <script>
+        const statusDiv = document.getElementById('status');
+        const logDiv = document.getElementById('log');
+        const sendBtn = document.getElementById('sendBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const receivedTextP = document.getElementById('receivedText');
+        const incomingArea = document.getElementById('incomingArea');
+
+        let ws;
+
+        function connect() {
+            // Replace localhost with your local IP if testing on real mobile device on same network
+            // For now we default to localhost for testing on same machine
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const host = window.location.hostname;
+            const port = '8080';
+            const wsUrl = `${protocol}//${host}:${port}`;
+
+            ws = new WebSocket(wsUrl);
+
+            ws.onopen = () => {
+                statusDiv.innerText = 'Connected';
+                statusDiv.style.color = 'green';
+            };
+
+            ws.onmessage = (event) => {
+                const text = event.data;
+                log('Received: ' + text.substring(0, 20) + '...');
+                receivedTextP.innerText = text;
+                incomingArea.style.display = 'block';
+            };
+
+            ws.onclose = () => {
+                statusDiv.innerText = 'Disconnected';
+                statusDiv.style.color = 'red';
+                setTimeout(connect, 3000);
+            };
+        }
+
+        sendBtn.addEventListener('click', async () => {
+            try {
+                const text = await navigator.clipboard.readText();
+                if (text) {
+                    ws.send(text);
+                    log('Sent: ' + text.substring(0, 20) + '...');
+                } else {
+                    log('Clipboard is empty or unreadable');
+                }
+            } catch (err) {
+                log('Error reading clipboard: ' + err.message);
+            }
+        });
+
+        copyBtn.addEventListener('click', async () => {
+            try {
+                await navigator.clipboard.writeText(receivedTextP.innerText);
+                log('Copied to local clipboard!');
+                incomingArea.style.display = 'none';
+            } catch (err) {
+                log('Error writing clipboard: ' + err.message);
+            }
+        });
+
+        function log(msg) {
+            logDiv.innerText = msg;
+        }
+
+        connect();
+    </script>
+</body>
+
+</html>
