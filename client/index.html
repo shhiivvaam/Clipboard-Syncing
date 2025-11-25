@@ -6,70 +6,240 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clipboard Sync Mobile</title>
     <style>
+        :root {
+            --bg-color: #1e1e1e;
+            --card-bg: #2d2d2d;
+            --text-color: #ffffff;
+            --accent-color: #3b82f6;
+            --danger-color: #ef4444;
+            --success-color: #22c55e;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            padding: 20px;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .header {
+            padding: 15px;
+            background: rgba(45, 45, 45, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #333;
             text-align: center;
+            font-weight: bold;
+        }
+
+        .container {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Landing Page */
+        #landing-page {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        input {
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background: #333;
+            color: white;
+            font-size: 1.1rem;
+            outline: none;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        input:focus {
+            border-color: var(--accent-color);
         }
 
         button {
-            padding: 15px 25px;
-            font-size: 18px;
-            margin: 10px;
-            width: 80%;
+            padding: 15px;
             border-radius: 8px;
             border: none;
-            background: #007bff;
-            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
             cursor: pointer;
+            width: 100%;
+            transition: opacity 0.2s;
         }
 
         button:active {
-            background: #0056b3;
+            opacity: 0.8;
         }
 
-        #log {
+        .btn-primary {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: #444;
+            color: white;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            color: #666;
+            font-size: 0.9rem;
+            width: 100%;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #444;
+            margin: 0 10px;
+        }
+
+        /* Room Page */
+        #room-page {
+            display: none;
+            width: 100%;
+            height: 100%;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .room-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .room-code {
+            font-size: 2.5rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: var(--accent-color);
+            margin: 10px 0;
+        }
+
+        .actions {
+            width: 100%;
+            max-width: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .incoming-area {
             margin-top: 20px;
-            color: #555;
-            word-break: break-all;
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 300px;
+            box-sizing: border-box;
+            display: none;
         }
 
-        .received {
-            background: #e8f5e9;
-            padding: 10px;
-            border-radius: 4px;
+        .incoming-text {
+            color: #ccc;
+            margin-bottom: 10px;
+            word-break: break-all;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        .status-msg {
             margin-top: 10px;
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+            margin-top: 30px;
         }
     </style>
 </head>
 
 <body>
-    <h1>Sync Clipboard</h1>
-
-    <div id="status">Disconnected</div>
-
-    <button id="sendBtn">📤 Push Clipboard</button>
-    <div id="incomingArea" style="display:none;">
-        <h3>Received Text:</h3>
-        <p id="receivedText" class="received"></p>
-        <button id="copyBtn">📥 Copy to Device</button>
+    <div class="header">
+        Clipboard Sync Mobile
     </div>
 
-    <div id="log"></div>
+    <div class="container">
+        <!-- Landing Page -->
+        <div id="landing-page">
+            <button id="create-btn" class="btn-primary">Create New Room</button>
+            <div class="divider">OR</div>
+            <input type="text" id="room-code-input" placeholder="Enter Room Code">
+            <button id="join-btn" class="btn-secondary">Join Room</button>
+            <div id="status" class="status-msg" style="text-align: center;">Connecting to server...</div>
+        </div>
+
+        <!-- Room Page -->
+        <div id="room-page">
+            <div class="room-header">
+                <div>Room Code</div>
+                <div id="current-room-code" class="room-code">------</div>
+            </div>
+
+            <div class="actions">
+                <button id="send-btn" class="btn-primary">📤 Push Clipboard</button>
+            </div>
+
+            <div id="incoming-area" class="incoming-area">
+                <div style="font-size: 0.8rem; color: #888; margin-bottom: 5px;">Received from Desktop:</div>
+                <div id="received-text" class="incoming-text"></div>
+                <button id="copy-btn" class="btn-secondary">📥 Copy to Device</button>
+            </div>
+
+            <button id="leave-btn" class="btn-danger">Disconnect</button>
+        </div>
+    </div>
 
     <script>
-        const statusDiv = document.getElementById('status');
-        const logDiv = document.getElementById('log');
-        const sendBtn = document.getElementById('sendBtn');
-        const copyBtn = document.getElementById('copyBtn');
-        const receivedTextP = document.getElementById('receivedText');
-        const incomingArea = document.getElementById('incomingArea');
+        const landingPage = document.getElementById('landing-page');
+        const roomPage = document.getElementById('room-page');
+        const statusEl = document.getElementById('status');
+        const roomCodeInput = document.getElementById('room-code-input');
+        const createBtn = document.getElementById('create-btn');
+        const joinBtn = document.getElementById('join-btn');
+        const leaveBtn = document.getElementById('leave-btn');
+        const sendBtn = document.getElementById('send-btn');
+        const copyBtn = document.getElementById('copy-btn');
+        const currentRoomCodeEl = document.getElementById('current-room-code');
+        const incomingArea = document.getElementById('incoming-area');
+        const receivedTextEl = document.getElementById('received-text');
 
         let ws;
+        let currentRoom = null;
+
+        function showLanding() {
+            landingPage.style.display = 'flex';
+            roomPage.style.display = 'none';
+            incomingArea.style.display = 'none';
+        }
+
+        function showRoom(code) {
+            landingPage.style.display = 'none';
+            roomPage.style.display = 'flex';
+            currentRoomCodeEl.innerText = code;
+        }
 
         function connect() {
-            // Replace localhost with your local IP if testing on real mobile device on same network
-            // For now we default to localhost for testing on same machine
             const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
             const host = window.location.hostname;
             const port = '8080';
@@ -78,51 +248,86 @@
             ws = new WebSocket(wsUrl);
 
             ws.onopen = () => {
-                statusDiv.innerText = 'Connected';
-                statusDiv.style.color = 'green';
+                statusEl.innerText = 'Connected to Server';
+                statusEl.style.color = '#4caf50';
             };
 
             ws.onmessage = (event) => {
-                const text = event.data;
-                log('Received: ' + text.substring(0, 20) + '...');
-                receivedTextP.innerText = text;
-                incomingArea.style.display = 'block';
+                try {
+                    const parsed = JSON.parse(event.data);
+                    const { type, payload } = parsed;
+
+                    switch (type) {
+                        case 'CREATED':
+                        case 'JOINED':
+                            currentRoom = payload.roomCode;
+                            showRoom(currentRoom);
+                            break;
+                        case 'CLIPBOARD':
+                            receivedTextEl.innerText = payload.text;
+                            incomingArea.style.display = 'block';
+                            break;
+                        case 'ERROR':
+                            alert(payload.message);
+                            break;
+                        case 'LEFT':
+                            currentRoom = null;
+                            showLanding();
+                            break;
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
             };
 
             ws.onclose = () => {
-                statusDiv.innerText = 'Disconnected';
-                statusDiv.style.color = 'red';
+                statusEl.innerText = 'Disconnected. Reconnecting...';
+                statusEl.style.color = '#ef4444';
+                showLanding();
                 setTimeout(connect, 3000);
             };
         }
 
+        createBtn.addEventListener('click', () => {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'CREATE' }));
+            }
+        });
+
+        joinBtn.addEventListener('click', () => {
+            const code = roomCodeInput.value.trim();
+            if (code && ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'JOIN', payload: { roomCode: code } }));
+            }
+        });
+
+        leaveBtn.addEventListener('click', () => {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'LEAVE' }));
+            }
+        });
+
         sendBtn.addEventListener('click', async () => {
             try {
                 const text = await navigator.clipboard.readText();
-                if (text) {
-                    ws.send(text);
-                    log('Sent: ' + text.substring(0, 20) + '...');
-                } else {
-                    log('Clipboard is empty or unreadable');
+                if (text && ws && ws.readyState === WebSocket.OPEN) {
+                    ws.send(JSON.stringify({ type: 'CLIPBOARD', payload: { text } }));
+                    alert('Clipboard pushed!');
                 }
             } catch (err) {
-                log('Error reading clipboard: ' + err.message);
+                alert('Failed to read clipboard: ' + err.message);
             }
         });
 
         copyBtn.addEventListener('click', async () => {
             try {
-                await navigator.clipboard.writeText(receivedTextP.innerText);
-                log('Copied to local clipboard!');
+                await navigator.clipboard.writeText(receivedTextEl.innerText);
+                alert('Copied to device!');
                 incomingArea.style.display = 'none';
             } catch (err) {
-                log('Error writing clipboard: ' + err.message);
+                alert('Failed to write clipboard: ' + err.message);
             }
         });
-
-        function log(msg) {
-            logDiv.innerText = msg;
-        }
 
         connect();
     </script>
