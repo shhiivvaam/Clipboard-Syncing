@@ -1,16 +1,50 @@
-const { app, BrowserWindow, clipboard, ipcMain } = require('electron');
+const { app, BrowserWindow, clipboard, ipcMain, Tray, Menu, nativeImage } = require('electron');
 const path = require('path');
 const WebSocket = require('ws');
 
 let mainWindow;
+let tray = null;
+let isQuitting = false;
 let ws;
 let lastText = '';
 let currentRoom = null;
 
+function createTray() {
+    const iconPath = path.join(__dirname, '..', 'icon.png');
+    const icon = nativeImage.createFromPath(iconPath);
+    tray = new Tray(icon.resize({ width: 16, height: 16 }));
+
+    const contextMenu = Menu.buildFromTemplate([
+        {
+            label: 'Show Clipboard Sync',
+            click: () => {
+                mainWindow.show();
+            }
+        },
+        {
+            label: 'Quit',
+            click: () => {
+                isQuitting = true;
+                app.quit();
+            }
+        }
+    ]);
+
+    tray.setToolTip('Clipboard Sync');
+    tray.setContextMenu(contextMenu);
+
+    tray.on('double-click', () => {
+        mainWindow.show();
+    });
+}
+
 function createWindow() {
+    const iconPath = path.join(__dirname, '..', 'icon.png');
+
     mainWindow = new BrowserWindow({
         width: 500,
         height: 700,
+        icon: iconPath,
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             nodeIntegration: false,
@@ -21,6 +55,14 @@ function createWindow() {
     });
 
     mainWindow.loadFile(path.join(__dirname, 'index.html'));
+
+    mainWindow.on('close', (event) => {
+        if (!isQuitting) {
+            event.preventDefault();
+            mainWindow.hide();
+            return false;
+        }
+    });
 }
 
 const PRODUCTION_URL = 'wss://clipboard-syncing.onrender.com';
@@ -123,6 +165,7 @@ ipcMain.handle('leave-room', () => {
 
 app.whenReady().then(() => {
     createWindow();
+    createTray();
     connectToServer();
     startClipboardPolling();
 
@@ -132,5 +175,7 @@ app.whenReady().then(() => {
 });
 
 app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') app.quit();
+    // Do not quit on window close, as we want to stay in tray
+    // Only quit if user explicitly quits from tray
+    if (process.platform !== 'darwin' && isQuitting) app.quit();
 });
