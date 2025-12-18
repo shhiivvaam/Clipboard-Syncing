@@ -214,6 +214,76 @@
             margin-top: 10px;
             margin-bottom: 20px;
         }
+
+        /* Download Card Styles */
+        .download-card {
+            margin-top: 30px;
+            background: linear-gradient(145deg, #2d2d2d, #252525);
+            border: 1px solid #444;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: left;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s;
+        }
+
+        .download-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent-color);
+        }
+
+        .download-header {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .download-features {
+            font-size: 0.9rem;
+            color: #ccc;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .feature-icon {
+            color: var(--success-color);
+        }
+
+        .download-btn-large {
+            background: linear-gradient(90deg, #2563eb, #3b82f6);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            border: none;
+            width: 100%;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+            text-decoration: none;
+        }
+
+        .download-btn-large:hover {
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5);
+            transform: scale(1.02);
+        }
     </style>
 </head>
 
@@ -232,17 +302,33 @@
             <button id="join-btn" class="btn-secondary">Join Room</button>
             <div id="status-msg" style="text-align: center; margin-top: 10px; color: #888;">Connecting...</div>
 
-            <div style="margin-top: 30px; border-top: 1px solid #444; padding-top: 20px;">
-                <div style="text-align: center; color: #aaa; font-size: 0.9rem; margin-bottom: 15px;">
-                    Want background syncing?
+            <div class="download-card">
+                <div class="download-header">
+                    <span>🚀</span> Upgrade Your Experience
+                </div>
+                <div class="download-features">
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span> Background Syncing (24/7)
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span> Minimize to System Tray
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span> Auto-Launch Support
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">✓</span> One-Click Copy
+                    </div>
                 </div>
                 <a href="https://github.com/shhiivvaam/Clipboard-Syncing/releases/latest/download/Clipboard.Sync.Setup.1.0.0.exe"
                     target="_blank" style="text-decoration: none;">
-                    <button
-                        style="background: #2563eb; display: flex; align-items: center; justify-content: center; gap: 10px;">
-                        <span>💻</span> Download for Windows
+                    <button class="download-btn-large">
+                        <span>📥</span> Download for Windows
                     </button>
                 </a>
+                <div style="text-align: center; margin-top: 10px; font-size: 0.8rem; color: #666;">
+                    v1.0.0 • Free • Safe & Secure
+                </div>
             </div>
         </div>
 
