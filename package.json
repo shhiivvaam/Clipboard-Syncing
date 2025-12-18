@@ -1,6 +1,6 @@
 {
   "name": "clipboard-syncing",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Clipboard Syncing",
   "main": "electron/main.js",
   "scripts": {
