@@ -43,16 +43,17 @@ For the best experience on Windows:
     ```
 
 ### Running Locally
-1.  **Start the Server**:
-    ```bash
-    node server/index.js
-    ```
-2.  **Start the Electron App**:
-    ```bash
-    npm start
-    ```
-3.  **Open Web Client**:
-    Open `client/index.html` in your browser.
+1.  **Quick Start (Recommended)**:
+    Double-click `start_all.bat` in the project folder. This will automatically launch:
+    -   The Sync Server (Port 8080)
+    -   The Web Client (http://localhost:8081)
+    -   The Electron Desktop App
+
+2.  **Manual Start**:
+    If you prefer to run components individually:
+    -   **Server**: `node server/index.js`
+    -   **Electron App**: `npm start`
+    -   **Web Client**: Open `client/index.html` in your browser.
 
 ### Building the Desktop App
 To create the `.exe` installer:
