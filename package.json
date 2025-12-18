@@ -5,7 +5,22 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electron electron/main.js"
+    "start": "electron electron/main.js",
+    "build": "electron-builder -w"
+  },
+  "build": {
+    "appId": "com.clipboard.sync",
+    "productName": "Clipboard Sync",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "electron/**/*",
+      "node_modules/**/*"
+    ],
+    "win": {
+      "target": "nsis"
+    }
   },
   "keywords": [],
   "author": "",
@@ -13,6 +28,7 @@
   "type": "commonjs",
   "devDependencies": {
     "electron": "^39.2.3",
+    "electron-builder": "^24.6.4",
     "ws": "^8.18.3"
   },
   "dependencies": {

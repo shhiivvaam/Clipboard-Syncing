@@ -1,14 +1,15 @@
 const WebSocket = require('ws');
 const { v4: uuidv4 } = require('uuid');
 
-const wss = new WebSocket.Server({ port: 8080 });
+const PORT = process.env.PORT || 8080;
+const wss = new WebSocket.Server({ port: PORT });
 
 // Map<RoomID, Set<WebSocket>>
 const rooms = new Map();
 // Map<RoomID, Array<string>>
 const roomHistory = new Map();
 
-console.log('Sync Server started on port 8080');
+console.log(`Sync Server started on port ${PORT}`);
 
 function broadcastToRoom(roomCode, senderWs, data) {
     if (rooms.has(roomCode)) {

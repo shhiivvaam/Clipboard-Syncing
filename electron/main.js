@@ -23,8 +23,13 @@ function createWindow() {
     mainWindow.loadFile(path.join(__dirname, 'index.html'));
 }
 
+const PRODUCTION_URL = 'wss://clipboard-syncing.onrender.com';
+const LOCAL_URL = 'ws://localhost:8080';
+const isDev = !app.isPackaged; // 'app' is already imported
+const SERVER_URL = isDev ? LOCAL_URL : PRODUCTION_URL;
+
 function connectToServer() {
-    ws = new WebSocket('ws://localhost:8080');
+    ws = new WebSocket(SERVER_URL);
 
     ws.on('open', () => {
         console.log('Connected to Sync Server');
