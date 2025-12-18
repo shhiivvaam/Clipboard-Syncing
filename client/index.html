@@ -52,7 +52,18 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
+            overflow-y: auto;
+        }
+
+        .content-wrapper {
+            margin: auto;
+            width: 100%;
+            max-width: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
         }
 
         /* Landing Page */
@@ -294,75 +305,77 @@
     </div>
 
     <div class="container">
-        <!-- Landing Page -->
-        <div id="landing-page">
-            <button id="create-btn" class="btn-primary">Create New Room</button>
-            <div class="divider">OR</div>
-            <input type="text" id="room-code-input" placeholder="Enter Room Code">
-            <button id="join-btn" class="btn-secondary">Join Room</button>
-            <div id="status-msg" style="text-align: center; margin-top: 10px; color: #888;">Connecting...</div>
+        <div class="content-wrapper">
+            <!-- Landing Page -->
+            <div id="landing-page">
+                <button id="create-btn" class="btn-primary">Create New Room</button>
+                <div class="divider">OR</div>
+                <input type="text" id="room-code-input" placeholder="Enter Room Code">
+                <button id="join-btn" class="btn-secondary">Join Room</button>
+                <div id="status-msg" style="text-align: center; margin-top: 10px; color: #888;">Connecting...</div>
 
-            <div class="download-card">
-                <div class="download-header">
-                    <span>🚀</span> Upgrade Your Experience
-                </div>
-                <div class="download-features">
-                    <div class="feature-item">
-                        <span class="feature-icon">✓</span> Background Syncing (24/7)
+                <div class="download-card">
+                    <div class="download-header">
+                        <span>🚀</span> Upgrade Your Experience
                     </div>
-                    <div class="feature-item">
-                        <span class="feature-icon">✓</span> Minimize to System Tray
+                    <div class="download-features">
+                        <div class="feature-item">
+                            <span class="feature-icon">✓</span> Background Syncing (24/7)
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-icon">✓</span> Minimize to System Tray
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-icon">✓</span> Auto-Launch Support
+                        </div>
+                        <div class="feature-item">
+                            <span class="feature-icon">✓</span> One-Click Copy
+                        </div>
                     </div>
-                    <div class="feature-item">
-                        <span class="feature-icon">✓</span> Auto-Launch Support
+                    <a href="https://github.com/shhiivvaam/Clipboard-Syncing/releases/latest/download/Clipboard.Sync.Setup.1.0.0.exe"
+                        target="_blank" style="text-decoration: none;">
+                        <button class="download-btn-large">
+                            <span>📥</span> Download for Windows
+                        </button>
+                    </a>
+                    <div style="text-align: center; margin-top: 10px; font-size: 0.8rem; color: #666;">
+                        v1.0.0 • Free • Safe & Secure
                     </div>
-                    <div class="feature-item">
-                        <span class="feature-icon">✓</span> One-Click Copy
-                    </div>
-                </div>
-                <a href="https://github.com/shhiivvaam/Clipboard-Syncing/releases/latest/download/Clipboard.Sync.Setup.1.0.0.exe"
-                    target="_blank" style="text-decoration: none;">
-                    <button class="download-btn-large">
-                        <span>📥</span> Download for Windows
-                    </button>
-                </a>
-                <div style="text-align: center; margin-top: 10px; font-size: 0.8rem; color: #666;">
-                    v1.0.0 • Free • Safe & Secure
-                </div>
-            </div>
-        </div>
-
-        <!-- Room Page -->
-        <div id="room-page">
-            <div class="room-header">
-                <div>Room Code</div>
-                <div id="current-room-code" class="room-code">------</div>
-                <div id="device-count" class="device-count">1 Device</div>
-            </div>
-
-            <div class="actions">
-                <button id="send-btn" class="btn-primary">📤 Push Clipboard</button>
-
-                <!-- Fallback for sending -->
-                <div id="send-fallback" class="fallback-area">
-                    <div style="font-size: 0.9rem;">Paste text here to send:</div>
-                    <textarea id="manual-input"></textarea>
-                    <button id="manual-send-btn" class="btn-primary">Send Text</button>
                 </div>
             </div>
 
-            <div class="history-list" id="history-list">
-                <!-- History items -->
-            </div>
+            <!-- Room Page -->
+            <div id="room-page">
+                <div class="room-header">
+                    <div>Room Code</div>
+                    <div id="current-room-code" class="room-code">------</div>
+                    <div id="device-count" class="device-count">1 Device</div>
+                </div>
 
-            <!-- Fallback for receiving (Copy) -->
-            <div id="receive-fallback" class="fallback-area">
-                <div style="font-size: 0.9rem;">Latest text received:</div>
-                <textarea id="manual-output" readonly></textarea>
-                <div style="font-size: 0.8rem; color: #aaa;">Select and copy manually</div>
-            </div>
+                <div class="actions">
+                    <button id="send-btn" class="btn-primary">📤 Push Clipboard</button>
 
-            <button id="leave-btn" class="btn-danger">Disconnect</button>
+                    <!-- Fallback for sending -->
+                    <div id="send-fallback" class="fallback-area">
+                        <div style="font-size: 0.9rem;">Paste text here to send:</div>
+                        <textarea id="manual-input"></textarea>
+                        <button id="manual-send-btn" class="btn-primary">Send Text</button>
+                    </div>
+                </div>
+
+                <div class="history-list" id="history-list">
+                    <!-- History items -->
+                </div>
+
+                <!-- Fallback for receiving (Copy) -->
+                <div id="receive-fallback" class="fallback-area">
+                    <div style="font-size: 0.9rem;">Latest text received:</div>
+                    <textarea id="manual-output" readonly></textarea>
+                    <div style="font-size: 0.8rem; color: #aaa;">Select and copy manually</div>
+                </div>
+
+                <button id="leave-btn" class="btn-danger">Disconnect</button>
+            </div>
         </div>
     </div>
 
