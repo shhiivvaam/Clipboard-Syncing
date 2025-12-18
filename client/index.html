@@ -475,8 +475,14 @@
 
         function connect() {
             const productionWsUrl = 'wss://clipboard-syncing.onrender.com';
-            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-            const wsUrl = isLocal ? 'ws://localhost:8080' : productionWsUrl;
+            // Check for localhost, 127.0.0.1, or typical local network IPs (192.168.x.x, 10.x.x.x)
+            const hostname = window.location.hostname;
+            const isLocal = hostname === 'localhost' ||
+                hostname === '127.0.0.1' ||
+                hostname.startsWith('192.168.') ||
+                hostname.startsWith('10.');
+            // If local, use the current hostname's IP with port 8080
+            const wsUrl = isLocal ? `ws://${hostname}:8080` : productionWsUrl;
 
             ws = new WebSocket(wsUrl);
 
