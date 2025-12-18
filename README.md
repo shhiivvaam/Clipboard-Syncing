@@ -14,7 +14,7 @@ A real-time clipboard synchronization tool that allows you to share text instant
 ## Getting Started
 
 ### 1. Using the Web Client
-Simply visit our [Web Interface](https://clipboard-syncing.vercel.app/) (Replace with your Vercel URL).
+Simply visit our [Web Interface](https://clipboard-sync.ambaycapital.com/)
 1.  **Create a Room**: Click "Create New Room" to generate a unique code.
 2.  **Join a Room**: Enter the code on another device to join.
 3.  **Sync**: Copy text on one device, and it will appear on the other!
@@ -62,6 +62,3 @@ To create the `.exe` installer:
     npm run build
     ```
 3.  Find the installer in the `dist` folder.
-
-## Deployment
-See [DEPLOY.md](DEPLOY.md) for detailed deployment instructions.
