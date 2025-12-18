@@ -11,20 +11,39 @@ A real-time clipboard synchronization tool that allows you to share text instant
     -   **System Tray Integration**: Quick access to Open/Quit via tray icon.
     -   **One-Click Copy**: History items can be copied with a single click.
 
-## Getting Started
+## 📖 Usage Guide & Connection Steps
 
-### 1. Using the Web Client
-Simply visit our [Web Interface](https://clipboard-sync.ambaycapital.com/)
-1.  **Create a Room**: Click "Create New Room" to generate a unique code.
-2.  **Join a Room**: Enter the code on another device to join.
-3.  **Sync**: Copy text on one device, and it will appear on the other!
+### Scenario 1: Using the Live Website (Production)
+The easiest way to use the app without any setup.
+1.  **Open the Web App**: Go to [https://clipboard-sync.ambaycapital.com](https://clipboard-sync.ambaycapital.com) on your **PC** and **Phone**.
+2.  **Create Room**: On one device, click "Create New Room".
+3.  **Join Room**: Enter the Room Code on the other device.
+4.  **Sync**: Copy text, and it's shared!
 
-### 2. Installing the Windows App
-For the best experience on Windows:
-1.  Download the latest installer from [Releases](https://github.com/shhiivvaam/Clipboard-Syncing/releases).
-2.  Run the `.exe` file to install.
-3.  Launch the app and join your room.
-4.  **Minimize to Tray**: You can close the window, and the app will keep running in the background.
+### Scenario 2: Connecting Phone to Local PC (Development)
+If you are running the app locally on your PC (via `start_all.bat` or `npm start`) and want to connect your phone:
+1.  **Ensure Same WiFi**: Connect your PC and Phone to the **same WiFi network**.
+2.  **Find PC IP Address**:
+    -   Open Command Prompt (`cmd`) on Windows.
+    -   Type `ipconfig` and press Enter.
+    -   Look for **IPv4 Address** (e.g., `192.168.1.5`).
+3.  **Connect on Phone**:
+    -   Open your phone's browser (Chrome/Safari).
+    -   Type: `http://<YOUR_IPV4>:8081` (e.g., `http://192.168.1.5:8081`).
+    -   You will see the green "Connected" dot.
+4.  **Join Room**: Enter the room code from your PC app.
+
+### Scenario 3: Using the Windows Desktop App
+For permanent background syncing on your computer.
+1.  **Download**: Get the latest `.exe` from [Releases](https://github.com/shhiivvaam/Clipboard-Syncing/releases).
+2.  **Install & Run**: Run the installer. The app will launch.
+3.  **Create/Join Room**: Create a room in the desktop app.
+4.  **Connect Other Devices**:
+    -   Open [https://clipboard-sync.ambaycapital.com](https://clipboard-sync.ambaycapital.com) on your **Phone** or **Laptop**.
+    -   Enter the **Room Code** shown in your Desktop App.
+    -   Now your PC and Phone are synced!
+5.  **Minimize to Tray**: Click the "X" button. The app will **not quit**; it minimizes to the System Tray (bottom right icons) to keep syncing in the background.
+    -   **Right-Click Tray Icon** to "Open" or "Quit".
 
 ## Development
 
